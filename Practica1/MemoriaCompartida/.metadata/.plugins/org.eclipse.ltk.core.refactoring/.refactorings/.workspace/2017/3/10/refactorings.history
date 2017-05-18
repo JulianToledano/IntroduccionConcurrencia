@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename resource &apos;MemoriaCompartida&apos; to &apos;creadorMatrices&apos;" description="Rename resource &apos;MemoriaCompartida&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="/MemoriaCompartida" name="creadorMatrices" stamp="1488891121603" updateReferences="true"/>
+</session>

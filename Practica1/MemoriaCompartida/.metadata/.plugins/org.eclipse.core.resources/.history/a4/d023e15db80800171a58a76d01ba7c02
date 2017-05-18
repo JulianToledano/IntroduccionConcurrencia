@@ -1,0 +1,153 @@
+/*
+ * main.c
+ *
+ *  Created on: 14 mar. 2017
+ *      Author: mateo3aldao
+ */
+
+/*
+ * main.c
+ *
+ *  Created on: 7 mar. 2017
+ *      Author: mateo3aldao
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+
+typedef struct matriz_t{
+	int numFilas;
+	int numColumnas;
+	int** datos;
+}matriz_t;
+
+int** crearMatriz(int numFilas, int numColumnas){
+
+	int** matriz = (int**)malloc(sizeof(int*)*numFilas);
+	for(int i=0;i<numFilas;i++){
+		matriz[i] = (int*)malloc(sizeof(int)*numColumnas);
+	}
+	return matriz;
+}
+
+int leeDato(FILE* fich){
+
+	char dato[100];
+	char datoLeido;
+	int contador = 0;
+	do{
+		if(!feof(fich)){
+			fread(&datoLeido,sizeof(char),1,fich);
+			if(datoLeido!=' '){
+				dato[contador] = datoLeido;
+				contador++;
+			}
+		}else datoLeido =' ';
+	}while(datoLeido!=' ');
+	dato[contador]='\0';
+	int datoInteger = atoi(dato);
+	return datoInteger;
+}
+
+matriz_t leerMatriz(char* nombreFichero, int traspuesta){
+
+	matriz_t matriz;
+	int numFilas, numColumnas;
+	FILE* fich =fopen(nombreFichero,"r");
+	if(fich==NULL){
+		printf("Error\n");
+		exit(0);
+	}
+	numFilas = leeDato(fich);
+	numColumnas = leeDato(fich);
+	matriz.datos = crearMatriz(numFilas,numColumnas);
+	if(!traspuesta){
+		for(int i=0;i<numFilas;i++)
+		for(int j=0;j<numColumnas;j++){
+			matriz.datos[i][j] = leeDato(fich);
+		}
+	}else{
+		for(int i=0;i<numFilas;i++)
+		for(int j=0;j<numColumnas;j++){
+			matriz.datos[j][i] = leeDato(fich);
+		}
+	}
+	matriz.numFilas = numFilas;
+	matriz.numColumnas = numColumnas;
+	fclose(fich);
+
+	return matriz;
+}
+
+int multiplicaVectores(int* v1,int* v2,int size){
+
+	int result =0;
+	for(int i=0;i<size;i++) result+=v1[i]*v2[i];
+	return result;
+}
+void multiplicaMatrices(matriz_t m1,matriz_t m2,matriz_t mRes){
+
+	for(int i=0;i<m1.numFilas;i++)
+	for(int j=0;j<m2.numColumnas;j++){
+		mRes.datos[i][j]=multiplicaVectores(m1.datos[i],m2.datos[j],m2.numColumnas);
+	}
+
+
+}
+
+void escribirMatrices(int** matriz,int numFilas,int numColumnas,char* nombre){
+
+	FILE* fich = fopen(nombre,"w");
+	if(fich==NULL){
+		printf("Error\n");
+		exit(0);
+	}else{
+
+		char charaux[100];
+		sprintf(charaux,"%d %d ",numFilas,numColumnas);
+		fwrite(charaux,sizeof(char),strlen(charaux),fich);
+		for(int i=0;i<numFilas;i++)
+		for(int j=0;j<numColumnas;j++){
+			sprintf(charaux,"%d",matriz[i][j]);
+			fwrite(charaux,sizeof(char),strlen(charaux),fich);
+		}
+	}
+	fclose(fich);
+}
+
+void imprimeMatriz(matriz_t m){
+
+	for(int i=0;i<m.numFilas;i++)
+	for(int j=0;j<m.numColumnas;j++){
+		printf("%d",m.datos[i][j]);
+	}
+	printf("\n");
+}
+
+int main(int argc,char** argv){
+///uso programa: multiplicarMatricesSec <matriz1> <matriz2> <matrizRes>
+
+///cargar datos
+	matriz_t m1,m2,mRes;
+	m1 = leerMatriz(argv[1],0);
+	m2 = leerMatriz(argv[2],0);
+
+///reservar resultado
+	mRes.numFilas = m1.numFilas;
+	mRes.numColumnas = m2.numColumnas;
+	mRes.datos = crearMatriz(mRes.numFilas,mRes.numColumnas);
+
+///multiplicar matrices
+	multiplicaMatrices(m1,m2,mRes);
+
+///escribir matriz resultado
+	escribirMatrices(mRes.datos,mRes.numFilas,mRes.numColumnas,argv[3]);
+
+///imprime matriz resultado
+	imprimeMatriz(mRes);
+
+	return 0;
+}
+

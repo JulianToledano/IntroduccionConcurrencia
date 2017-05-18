@@ -1,0 +1,27 @@
+////////gcov///////
+
+1º)
+
+Speedup teorico:
+
+S=1/((1-f) + F/G)
+
+Nº cores maximo = 8
+
+F = 0.95 --> % de uso optimizable usando threads
+
+//Para 2 cores
+S teorico = 1/(0.05 + 0.95 / 2) = 1.90
+//Para 4 cores
+S teorico = 3.47 (solamente cambiar el 2 por el 4 en la formula de arriba)
+//Para 6 cores
+S teorico = 4.8
+//Para 8 cores
+S teorico = 5.9
+
+Speedup teorico maximo:
+
+infinitos cores
+S teorico = 1/0.05 = 20
+
+
