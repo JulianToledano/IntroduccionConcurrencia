@@ -185,12 +185,16 @@ int main(int argc, char** argv) {
 	DEBUG_PRINT_FINALTIME("Tiempo recepción: ");
 	}
 
-
-
 	// Escribir resultado
 	escribirMatriz(mres.datos, mres.filas, mres.columnas, argv[3]);
+	// Liberar memoria
+	for(int i = 0; i < m1.columnas; i++){
+		free(m1.datos[i]);free(m2.datos[i]);free(mres.datos[i]);
+	}
+	free(m1.datos);free(m2.datos);free(mres.datos);
 
   MPI_Finalize();
+
 	DEBUG_TIME_END;
 	DEBUG_PRINT_FINALTIME("Tiempo Total: ");
   return 0;
