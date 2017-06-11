@@ -1,0 +1,120 @@
+DIVISION ESTÁTICA
+
+MATRIZ 100
+---------------------------------------
+1 nucleo
+Tiempo mutiplicar:  time: 0.007292 
+Tiempo Total:  time: 0.013372 
+--------------------------------------
+2 nucleos
+Tiempo mutiplicar:  time: 0.004769 
+Tiempo Total:  time: 0.022969 
+----------------------------------------
+4 nucleos
+Tiempo mutiplicar:  time: 0.003559 
+Tiempo Total:  time: 0.010265
+-----------------------------------
+8 nucleos
+Tiempo mutiplicar:  time: 0.002904 
+Tiempo Total:  time: 0.041801
+
+***************************************
+
+MATRIZ 1000
+--------------------------------------
+1 nucleo
+Tiempo mutiplicar:  time: 5.675095 
+Tiempo Total:  time: 6.169089 
+
+--------------------------------------
+2 nucleos
+Tiempo mutiplicar:  time: 3.067651 
+Tiempo Total:  time: 3.739184 
+--------------------------------------
+4 nucleos
+Tiempo mutiplicar:  time: 1.595651 
+Tiempo Total:  time: 2.097008 
+--------------------------------------
+8 nucleos
+Tiempo mutiplicar:  time: 1.491617 
+Tiempo Total:  time: 2.021691 
+
+**********************************************
+
+MATRIZ 10000
+---------------------------------------------
+1 nucleo
+Tiempo mutiplicar:  time: 12579.414381 
+Tiempo Total:  time: 12631.317268 
+----------------------------------------------
+2 nucleos
+Tiempo mutiplicar:  time: 2849.231920 
+Tiempo Total:  time: 2890.660679 
+----------------------------------------------
+4 nucleos
+Tiempo mutiplicar:  time: 1497.539026 
+Tiempo Total:  time: 1547.447173 
+---------------------------------------------
+8 nucleos
+Tiempo mutiplicar:  time: 1497.892267 
+Tiempo Total:  time: 1547.854233 
+**********************************************************************************************
+BALANCEO CARGA 
+
+MATRIZ 100
+--------------------------------------
+1 nucleo
+Tiempo multiplicar:  time: 0.008323 
+Tiempo Total:  time: 0.046226 
+--------------------------------------
+2 nucleos
+Tiempo multiplicar:  time: 0.003324 
+Tiempo Total:  time: 0.009174 
+--------------------------------------
+4 nucleos
+Tiempo multiplicar:  time: 0.002597 
+Tiempo Total:  time: 0.016915 
+--------------------------------------
+8 nucleos
+Tiempo multiplicar:  time: 0.005855 
+Tiempo Total:  time: 0.021729 
+
+*************************************
+
+MATRIZ 1000
+--------------------------------------
+1 nucleo
+Tiempo multiplicar:  time: 4.521556 
+Tiempo Total:  time: 5.076307 
+--------------------------------------
+2 nucleos
+Tiempo multiplicar:  time: 2.429710 
+Tiempo Total:  time: 3.018630 
+--------------------------------------
+4 nucleos
+Tiempo multiplicar:  time: 1.460006 
+Tiempo Total:  time: 1.997886 
+--------------------------------------
+8 nucleos
+Tiempo multiplicar:  time: 1.425648 
+Tiempo Total:  time: 3.376288 
+
+***************************************
+
+MATRIZ 10000
+--------------------------------------
+1 nucleo
+Tiempo multiplicar:  time: 4350.489087 
+Tiempo Total:  time: 4401.112253
+--------------------------------------
+2 nucleos 
+Tiempo multiplicar:  time: 2276.794979 
+Tiempo Total:  time: 2326.371252 
+--------------------------------------
+4 nucleos
+Tiempo multiplicar:  time: 1392.386813 
+Tiempo Total:  time: 1445.440408 
+--------------------------------------
+8 nucleos
+Tiempo multiplicar:  time: 1398.840406 
+Tiempo Total:  time: 1451.595013

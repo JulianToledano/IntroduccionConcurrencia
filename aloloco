@@ -1,0 +1,55 @@
+A LO LOCO
+
+MATRIZ 100
+1 nucleo
+Tiempo multiplicacion:  time: 0.189919 
+Tiempo Total:  time: 0.337256 
+
+2 nucleos
+Tiempo multiplicacion:  time: 0.195957 
+Tiempo Total:  time: 0.203123 
+
+4 nucleos
+Tiempo multiplicacion:  time: 0.153687 
+Tiempo Total:  time: 0.158277 
+
+8 nucleos
+Tiempo multiplicacion:  time: 0.219541 
+Tiempo Total:  time: 0.226555 
+
+-------------------------------------------
+MATRIZ 1000
+1 nucleo
+Tiempo multiplicacion:  time: 20.342364 
+Tiempo Total:  time: 20.971387 
+
+2nucleos
+Tiempo multiplicacion:  time: 12.850257 
+Tiempo Total:  time: 13.340195 
+
+4 nucleos
+Tiempo multiplicacion:  time: 17.231070 
+Tiempo Total:  time: 18.216306 
+
+8 nucleos
+Tiempo multiplicacion:  time: 13.977885 
+Tiempo Total:  time: 14.478146 
+
+--------------------------------------------------
+MATRIZ 10000
+1 nucleo 
+Tiempo multiplicacion:  time: 4031.720012 
+Tiempo Total:  time: 4078.620450 
+
+2 nucleos
+Tiempo multiplicacion:  time: 2128.079013 
+Tiempo Total:  time: 2175.530261 
+
+4 nucleos
+Tiempo multiplicacion:  time: 1638.607040 
+Tiempo Total:  time: 1685.753670 
+
+8 nucleos
+Tiempo multiplicacion:  time: 1608.035928 
+Tiempo Total:  time: 1656.483126 
+
