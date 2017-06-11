@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <cuda.h>
 #include "debug_time.h"
 
 #define PROCESADORES 8
@@ -134,35 +135,20 @@ void printMatrix(matriz_t matrix) {
     }
 }
 
-__global__  void multiplicarMatrices(void){
-	printf("zdfds");
-}
 
 int main(int argc, char** argv) {
 /// uso programa: multiplicarMatricesSec <matriz1> <matriz2> <matrizresultado> // Recomendacion una clase matriz
 
-	// cargar datos
-	//matriz_t m1, m2, mres;
-	int *d_m1;
-	/*m1 = leerMatriz(argv[1], 0);
-	m2 = leerMatriz(argv[2], 1);*/
-
-	/*int **temp;
-	temp = (int**)malloc(sizeof(int*)*m1.filas);*/
-	cudaMalloc((void**)&d_m1, 10*sizeof(int));
-	/*for(int i = 0; i < m1.filas; i++){
-		cudaMalloc((void**)&(temp[i]),m1.columnas*sizeof(int));
-		cudaMemcpy(temp[i], m1.datos[i], m1.columnas*sizeof(int), cudaMemcpyHostToDevice);
-		cudaMemcpy(d_m1+i, &(temp[i]), sizeof(int*), cudaMemcpyHostToDevice);
-	}*/
-
-	// reservar resultado
-	/*mres.filas = m1.filas;
+	// Leer matrices
+	matriz_t m1, m2, mres;
+	m1 = leerMatriz(argv[1], 0);
+	m2 = leerMatriz(argv[2], 1);
+	// reservar resultado ¿?¿?¿?¿?¿?¿?
+	mres.filas = m1.filas;
 	mres.columnas = m2.columnas;
-	mres.datos = crearMatriz(mres.filas, mres.columnas);*/
-	printf("antes");
-	multiplicarMatrices<<<2,2>>>();
-	printf("dspues");
+	mres.datos = crearMatriz(mres.filas, mres.columnas);
+
+
 
 
 	// Escribir resultado
