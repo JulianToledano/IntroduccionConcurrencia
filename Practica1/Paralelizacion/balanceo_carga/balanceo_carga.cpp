@@ -7,10 +7,6 @@
 
 #define PROCESADORES 1
 
-typedef struct TH_T{
-	int id;
-}TH_T;
-
 typedef struct matriz_t
 {
 	int filas;
@@ -149,21 +145,11 @@ void rellenar_lista(int paquetes, matriz_t m1, matriz_t m2, std::list<paquete> *
 
 		// Introdicimos en la lista
 		lista->push_back(nuevo);
-/*
-		// Liberar memoria nuevo.datos??
-		for(int i = 0; i < m1.columnas; i++)
-			free(nuevo.matriz1_datos[i]);
-		free(nuevo.matriz1_datos);
-		for(int i = 0; i < m2.columnas; i++)
-			free(nuevo.matriz2_datos[i]);
-		free(nuevo.matriz2_datos);*/
 	}
 }
 
 void multiplicar_matrices(paquete pa){
-	//paquete *myparams = (paquete*)param;
 	int resultado = 0;
-
 	for(int i = 0; i <= pa.matriz1_final - pa.matriz1_inicial; i++)
 		for(int  j = 0; j <= pa.matriz2_final; j++){
 				mres.datos[pa.matriz1_inicial + i][j] = 0;
@@ -172,20 +158,13 @@ void multiplicar_matrices(paquete pa){
 		}
 }
 
-void obtener_paquete_y_multiplicar(void *param){
-	TH_T *myparams = (TH_T*)param;
-	printf("Dentro del thread\n");
+void obtener_paquete_y_multiplicar(/*void *param*/){
 	while(!lista.empty()){
 		pthread_mutex_lock(&cerrojo);
 		paquete test = lista.front();
 		lista.pop_front();
 		pthread_mutex_unlock(&cerrojo);
-		//printf("ID: %d inicial1: %d final1: %d inicial2: %d final2: %d\n",myparams->id, test.matriz1_inicial, test.matriz1_final, test.matriz2_inicial, test.matriz2_final);
-		/*for(int i = 0; i < 2; i++){
-			for(int j = 0; j < 20; j++)
-				printf("%d ", test.matriz1_datos[i][j]);
-			printf("%\n" );*/
-			multiplicar_matrices(test);
+		multiplicar_matrices(test);
 		}
 	}
 
@@ -205,50 +184,39 @@ int main(int argc, char** argv) {
 	mres.columnas = m2.columnas;
 	mres.datos = crearMatriz(mres.filas, mres.columnas);
 
-
+	// Rellenamos la lista con los trabajos
 	rellenar_lista(total, m1, m2, &lista);
-	printf("Creada la lista\n");
+
 	// Creamos los threads
 	{
 	DEBUG_TIME_INIT;
 	DEBUG_TIME_START;
 	pthread_mutex_init(&cerrojo,NULL);
 	pthread_t th[PROCESADORES];
-	TH_T* params = (TH_T*)malloc(sizeof(TH_T)*PROCESADORES);
 	for(int i = 0; i < PROCESADORES; i++){
-		params[i].id = i;
-		pthread_create (&th[i],NULL, (void * (*)(void *))&obtener_paquete_y_multiplicar, &(params[i]));
+		pthread_create (&th[i],NULL, (void * (*)(void *))&obtener_paquete_y_multiplicar, NULL);
 	}
-	printf("Antes de join\n");
-	for(int i = 0; i < PROCESADORES; i++){
-		printf("Dentro de join %d\n", i);
+	// JOIN
+	for(int i = 0; i < PROCESADORES; i++)
 		pthread_join(th[i], NULL);
-	}
+	// Destruimos cerrojo
 	pthread_mutex_destroy(&cerrojo);
+
 	DEBUG_TIME_END;
 	DEBUG_PRINT_FINALTIME("Tiempo multiplicar: ");
 	}
-/*
-	while(!lista.empty()){
-		paquete test = lista.front();
-		lista.pop_front();
-		printf("inicial1: %d final1: %d inicial2: %d final2: %d\n", test.matriz1_inicial, test.matriz1_final, test.matriz2_inicial, test.matriz2_final);
-		for(int i = 0; i < 1000; i++){
-			for(int j = 0; j < 1000; j++)
-				printf("%d ", test.matriz1_datos[i][j]);
-			printf("%\n" );
-		}
-	}*/
-
-	//for(int i = 0; i < PROCESADORES; i++)
-	//	printf("%d %d %d\n", lista[i].matriz1_inicial, lista[i].matriz1_final,lista[i].matriz1_datos[0][0]);
 
 	// Escribir resultado
 	escribirMatriz(mres.datos, mres.filas, mres.columnas, argv[3]);
 
+	// Liberar memoria
+	for(int i = 0; i < m1.columnas; i++){
+		free(m1.datos[i]);free(m2.datos[i]);free(mres.datos[i]);
+	}
+	free(m1.datos);free(m2.datos);free(mres.datos);
+
 	DEBUG_TIME_END;
 	DEBUG_PRINT_FINALTIME("Tiempo Total: ");
-	// Imprimir matriz
-	//printMatrix(mres);
-	// Liberar datos
+
+	return 0;
 }

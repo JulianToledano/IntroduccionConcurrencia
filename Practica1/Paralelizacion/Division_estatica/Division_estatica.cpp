@@ -86,25 +86,7 @@ matriz_t leerMatriz(char* nombreFichero, int traspuesta) {
 
     return matriz;
 }
-/*
-int multiplicaVectores(int* v1, int* v2, int size) {
-	int result = 0,i;
-	for (i = 0; i < size; ++i)
-	{
-		result += v1[i]*v2[i];
-	}
-	return result;
-}
 
-void multiplicarMatrices(matriz_t m1, matriz_t m2, matriz_t mres) {
-	int i, j;
-	for(i = 0; i < m1.filas; i++) {
-        for(j = 0; j < m2.columnas; j++) {
-            mres.datos[i][j] = multiplicaVectores(m1.datos[i], m2.datos[j], m2.columnas);
-        }
-	}
-}
-*/
 void escribirMatriz(int** matriz, int numFilas, int numColumnas, char* fileName) {
     FILE* fich = fopen(fileName, "w");
     if(fich == NULL) {
@@ -136,13 +118,17 @@ void printMatrix(matriz_t matrix) {
     }
 }
 
+// Creacion de un paquete por procesador
+// paquete *lista -> lista que se rellena dentro de la finción.
 void crear_paquetes(int procesadores, matriz_t m1, matriz_t m2, paquete *lista){
+
 	int division = m1.filas / procesadores;
 	int resto = division + (m1.filas % procesadores);
 
 	for(int i = 0; i < procesadores; i++){
 		lista[i].matriz1_inicial = i * division;
 		// Si es el último procesador lo sobrecargamos en el caso de que la division no haya sido entera
+		// ¿?¿? Tal vez mejor poner el final como el total de las filas¿?¿?
 		if(i == procesadores-1){
 			lista[i].matriz1_datos = crearMatriz(resto, m1.columnas);
 			lista[i].matriz1_final = i * division + resto - 1;
@@ -174,8 +160,6 @@ void crear_paquetes(int procesadores, matriz_t m1, matriz_t m2, paquete *lista){
 void multiplicar_matrices(void *param){
 	paquete *myparams = (paquete*)param;
 	int resultado = 0;
-	//printf("%d ", myparams->matriz1_datos[0][0]);
-	//printf("%d\n", myparams->matriz2_datos[0][0]);
 	for(int i = 0; i <= myparams->matriz1_final - myparams->matriz1_inicial; i++)
 		for(int  j = 0; j <= myparams->matriz2_final; j++){
 				mres.datos[myparams->matriz1_inicial + i][j] = 0;
@@ -204,9 +188,6 @@ int main(int argc, char** argv) {
 	mres.columnas = m2.columnas;
 	mres.datos = crearMatriz(mres.filas, mres.columnas);
 
-	//for(int i = 0; i < PROCESADORES; i++)
-	//	printf("%d %d %d\n", lista[i].matriz1_inicial, lista[i].matriz1_final,lista[i].matriz1_datos[0][0]);
-
 	pthread_t th[PROCESADORES];
 
 	{
@@ -215,8 +196,6 @@ int main(int argc, char** argv) {
 
 	for(int i = 0; i < PROCESADORES; i++)
 		pthread_create(&(th[i]), NULL, (void * (*)(void *))&multiplicar_matrices, &(lista[i]));
-
-
 
 		for(int i = 0; i < PROCESADORES; i++)
 			pthread_join(th[i], NULL);
@@ -227,9 +206,14 @@ int main(int argc, char** argv) {
 	// Escribir resultado
 	escribirMatriz(mres.datos, mres.filas, mres.columnas, argv[3]);
 
+	// Liberar memoria
+	for(int i = 0; i < m1.columnas; i++){
+		free(m1.datos[i]);free(m2.datos[i]);free(mres.datos[i]);
+	}
+	free(m1.datos);free(m2.datos);free(mres.datos);
+
 	DEBUG_TIME_END;
 	DEBUG_PRINT_FINALTIME("Tiempo Total: ");
-	// Imprimir matriz
-	//printMatrix(mres);
-	// Liberar datos
+
+	return 0;
 }
