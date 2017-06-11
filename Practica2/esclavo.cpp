@@ -61,7 +61,7 @@ int main(){
   // Enviamos resultado
   for(int i = 0; i < trabajo.final_m1 - trabajo.inicio_m1; i++)
     MPI_Send(resultado[i],trabajo.columnas_m2,MPI_INT,0,3, MPI_COMM_WORLD);
-    
+
   // Liberar memoria
   for(int i = 0; i < trabajo.final_m1 - trabajo.inicio_m1; i++){
     free(matriz_1[i]); free(resultado[i]);

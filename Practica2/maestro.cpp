@@ -1,15 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <list>
-#include <stddef.h>
 #include <mpi.h>
+#include "debug_time.h"
 
 #define NODOS 4
-
-typedef struct TH_T{
-	int id;
-}TH_T;
 
 typedef struct matriz_t
 {
@@ -127,6 +122,10 @@ void printMatrix(matriz_t matrix) {
 
 int main(int argc, char** argv) {
 /// uso programa: multiplicarMatricesSec <matriz1> <matriz2> <matrizresultado>
+
+	DEBUG_TIME_INIT;
+	DEBUG_TIME_START;
+
   int rank;
   MPI_Status status;
   MPI_Init(&argc, &argv);
@@ -144,6 +143,10 @@ int main(int argc, char** argv) {
   paquete nuevo;
   int division = m1.filas/NODOS;
 
+	// Envio de datos
+	{
+	DEBUG_TIME_INIT;
+	DEBUG_TIME_START;
   for(int i = 0; i < NODOS; i++){
     nuevo.filas_m1 = m1.filas;
     nuevo.columnas_m1 = m1.columnas;
@@ -161,20 +164,34 @@ int main(int argc, char** argv) {
     for(int j = nuevo.inicio_m2; j < nuevo.final_m2; j++)
       MPI_Send(m2.datos[j], nuevo.columnas_m2, MPI_INT, i+1, 2, MPI_COMM_WORLD);
   }
-
+	DEBUG_TIME_END;
+	DEBUG_PRINT_FINALTIME("Tiempo envío: ");
+	}
+	{
+	DEBUG_TIME_INIT;
+	DEBUG_TIME_START;
   // Como se reciven de forma ordenada no es necesario especificar la fila
- for(int i = 0; i < NODOS; i++)
+	for(int i = 0; i < NODOS; i++)
     for(int j = division*i; j < division*(i+1); j++){
       MPI_Recv(mres.datos[j], nuevo.columnas_m2, MPI_INT, i+1, 3, MPI_COMM_WORLD, &status);
       //for(int k = 0; k < 100; k++) printf("%d ", mres.datos[j][k]);
     //printf("\n" );
   }
-
-
+	DEBUG_TIME_END;
+	DEBUG_PRINT_FINALTIME("Tiempo recepción: ");
+	}
 
 	// Escribir resultado
 	escribirMatriz(mres.datos, mres.filas, mres.columnas, argv[3]);
+	// Liberar memoria
+	for(int i = 0; i < m1.columnas; i++){
+		free(m1.datos[i]);free(m2.datos[i]);free(mres.datos[i]);
+	}
+	free(m1.datos);free(m2.datos);free(mres.datos);
 
   MPI_Finalize();
+
+	DEBUG_TIME_END;
+	DEBUG_PRINT_FINALTIME("Tiempo Total: ");
   return 0;
 }
