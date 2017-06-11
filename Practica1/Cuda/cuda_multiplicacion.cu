@@ -13,17 +13,6 @@ typedef struct matriz_t
 	int** datos;
 } matriz_t;
 
-typedef struct paquete_trabajo{
-	int **matriz1_datos;
-	int matriz1_inicial;
-	int matriz1_final;
-
-	int **matriz2_datos;
-	int matriz2_inicial;
-	int matriz2_final;
-}paquete;
-
-
 int** crearMatriz(int numFilas, int numColumnas) {
     int** matriz =(int**) malloc(sizeof(int*) * numFilas);
     int i;
@@ -85,25 +74,7 @@ matriz_t leerMatriz(char* nombreFichero, int traspuesta) {
 
     return matriz;
 }
-/*
-int multiplicaVectores(int* v1, int* v2, int size) {
-	int result = 0,i;
-	for (i = 0; i < size; ++i)
-	{
-		result += v1[i]*v2[i];
-	}
-	return result;
-}
 
-void multiplicarMatrices(matriz_t m1, matriz_t m2, matriz_t mres) {
-	int i, j;
-	for(i = 0; i < m1.filas; i++) {
-        for(j = 0; j < m2.columnas; j++) {
-            mres.datos[i][j] = multiplicaVectores(m1.datos[i], m2.datos[j], m2.columnas);
-        }
-	}
-}
-*/
 void escribirMatriz(int** matriz, int numFilas, int numColumnas, char* fileName) {
     FILE* fich = fopen(fileName, "w");
     if(fich == NULL) {
@@ -135,27 +106,110 @@ void printMatrix(matriz_t matrix) {
     }
 }
 
+__device__ int multiplicarVector(int lado, int* fila, int* columna) {
+	int resultado = 0;
+	for (int i = 0; i < lado; i++) {
+		resultado += fila[i] * columna[i];
+	}
+	return resultado;
+}
+
+__global__ void multiplicarMatrices_kernel(int size, int** matriz1, int** matriz2, int** resultado) {
+	int col = blockIdx.y * blockDim.x + threadIdx.x;
+	int fil = blockIdx.x * blockDim.y + threadIdx.y;
+
+	if((col >= size) || (fil>= size)){
+		return;
+	}
+	//printf("fila: %d columna: %d dato1: %f dato2: %f \n", fil, col, matriz1[fil][col], matriz2[col][fil]);
+	resultado[fil][col] = multiplicarVector(size, matriz1[fil], matriz2[col]);
+
+}
 
 int main(int argc, char** argv) {
-/// uso programa: multiplicarMatricesSec <matriz1> <matriz2> <matrizresultado> // Recomendacion una clase matriz
+	
+	DEBUG_TIME_INIT;
+	DEBUG_TIME_START;
 
-	// Leer matrices
+	// Leer matrices en el host
 	matriz_t m1, m2, mres;
 	m1 = leerMatriz(argv[1], 0);
 	m2 = leerMatriz(argv[2], 1);
-	// reservar resultado ¿?¿?¿?¿?¿?¿?
+	// Reservar memoria para el resultado
 	mres.filas = m1.filas;
 	mres.columnas = m2.columnas;
 	mres.datos = crearMatriz(mres.filas, mres.columnas);
 
+	// Datos de intercambio entre host y device
+	int **i_m1, **i_m2, **i_res;
+	// Datos del device
+	int **d_m1, **d_m2, **d_res;
 
+	i_m1 = (int**)malloc(m1.columnas * sizeof(int*));
+	i_m2 = (int**)malloc(m1.columnas * sizeof(int*));
+	i_res = (int**)malloc(m1.columnas * sizeof(int*));
 
+	// Reservamos memoria para las matrices en device
+	cudaMalloc((void**)&d_res,sizeof(int*)* m1.columnas);
+	cudaMalloc((void**)&d_m1,sizeof(int*)* m1.columnas);
+	cudaMalloc((void**)&d_m2,sizeof(int*)* m1.columnas);
+
+	// Reservamos memoria para la zona de intercabio
+	for(int i = 0; i < m1.columnas; i++){
+		cudaMalloc((void**)&(i_m1[i]),sizeof(int)* m1.columnas);
+		cudaMalloc((void**)&(i_m2[i]),sizeof(int)* m1.columnas);
+		cudaMalloc((void**)&(i_res[i]),sizeof(int)* m1.columnas);
+	}
+	// Copiamos los datos a la zona de intercambio
+	for(int i = 0; i < m1.columnas;i++){
+		cudaMemcpy(i_m1[i], m1.datos[i], m1.columnas * sizeof(int),cudaMemcpyHostToDevice);
+		cudaMemcpy(i_m2[i], m2.datos[i], m1.columnas * sizeof(int),cudaMemcpyHostToDevice);
+	}
+	// Copiamos lso datos de la zona de intercambio a la memoria device
+	cudaMemcpy(d_m1, i_m1, m1.columnas * sizeof(int*),cudaMemcpyHostToDevice);
+	cudaMemcpy(d_m2, i_m2, m1.columnas * sizeof(int*),cudaMemcpyHostToDevice);
+	cudaMemcpy(d_res, i_res, m1.columnas * sizeof(int*),cudaMemcpyHostToDevice);
+
+	//int bloque = 32;
+
+	dim3 grid = dim3((m1.columnas / 32) + 1, (m1.columnas / 32) + 1, 1);
+	dim3 block = dim3(32, 32, 1);
+
+	multiplicarMatrices_kernel <<<grid, block>>> (m1.columnas, d_m1, d_m2, d_res);
+
+	for(int i = 0; i < m1.columnas;i++)
+		cudaMemcpy(mres.datos[i], i_res[i], m1.columnas * sizeof(int), cudaMemcpyDeviceToHost);
 
 	// Escribir resultado
-	//escribirMatriz(mres.datos, mres.filas, mres.columnas, argv[3]);
+	escribirMatriz(mres.datos, mres.filas, mres.columnas, argv[3]);
+
+	//free
+
+	for(int i = 0; i < m1.columnas; i++){
+	//	free(matriz1_CPU[i]);
+	//	free(matriz2_CPU[i]);
+	//	free(resultadoFinal_CPU[i]);
+
+		cudaFree(i_m1[i]);
+		cudaFree(i_m2[i]);
+		cudaFree(i_res[i]);
+
+	}
+
+	//free(matriz1_CPU);
+	//free(matriz2_CPU);
+	//free(resultadoFinal_CPU);
+	free(i_m1);
+	free(i_m2);
+	free(i_res);
 
 
-	// Imprimir matriz
-	//printMatrix(mres);
-	// Liberar datos
+	cudaFree(d_m1);
+	cudaFree(d_m2);
+	cudaFree(d_res);
+
+	DEBUG_TIME_END;
+	DEBUG_PRINT_FINALTIME("Tiempo Total: ");
+
+	return 0;
 }
