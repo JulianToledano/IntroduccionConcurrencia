@@ -108,26 +108,22 @@ void printMatrix(matriz_t matrix) {
 
 __device__ int multiplicarVector(int lado, int* fila, int* columna) {
 	int resultado = 0;
-	for (int i = 0; i < lado; i++) {
+	for (int i = 0; i < lado; i++)
 		resultado += fila[i] * columna[i];
-	}
+
 	return resultado;
 }
 
-__global__ void multiplicarMatrices_kernel(int size, int** matriz1, int** matriz2, int** resultado) {
-	int col = blockIdx.y * blockDim.x + threadIdx.x;
-	int fil = blockIdx.x * blockDim.y + threadIdx.y;
+__global__ void multiplicarMatrices(int tamano, int** matriz1, int** matriz2, int** resultado) {
 
-	if((col >= size) || (fil>= size)){
-		return;
-	}
-	//printf("fila: %d columna: %d dato1: %f dato2: %f \n", fil, col, matriz1[fil][col], matriz2[col][fil]);
-	resultado[fil][col] = multiplicarVector(size, matriz1[fil], matriz2[col]);
-
+	int columna = blockIdx.y * blockDim.x + threadIdx.x;
+	int fila = blockIdx.x * blockDim.y + threadIdx.y;
+	if((columna >= tamano) || (fila>= tamano)) return;
+	resultado[fila][columna] = multiplicarVector(tamano, matriz1[fila], matriz2[columna]);
 }
 
 int main(int argc, char** argv) {
-	
+
 	DEBUG_TIME_INIT;
 	DEBUG_TIME_START;
 
@@ -174,9 +170,13 @@ int main(int argc, char** argv) {
 
 	dim3 grid = dim3((m1.columnas / 32) + 1, (m1.columnas / 32) + 1, 1);
 	dim3 block = dim3(32, 32, 1);
-
-	multiplicarMatrices_kernel <<<grid, block>>> (m1.columnas, d_m1, d_m2, d_res);
-
+	{
+	DEBUG_TIME_INIT;
+	DEBUG_TIME_START;
+	multiplicarMatrices<<<grid, block>>> (m1.columnas, d_m1, d_m2, d_res);
+	DEBUG_TIME_END;
+	DEBUG_PRINT_FINALTIME("Tiempo multiplicacion: ");
+	}
 	for(int i = 0; i < m1.columnas;i++)
 		cudaMemcpy(mres.datos[i], i_res[i], m1.columnas * sizeof(int), cudaMemcpyDeviceToHost);
 

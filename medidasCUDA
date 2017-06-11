@@ -1,11 +1,14 @@
 CUDA
 
 100
-Tiempo Total:  time: 0.307156 
+Tiempo multiplicacion:  time: 0.000013 
+Tiempo Total:  time: 0.292176 
 
 1000
-Tiempo Total:  time: 1.102838 
+Tiempo multiplicacion:  time: 0.000016 
+Tiempo Total:  time: 1.067502 
 
 10000
-Tiempo Total:  time: 798.117628 
+Tiempo multiplicacion:  time: 0.000021 
+Tiempo Total:  time: 794.984448 
 
