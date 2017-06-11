@@ -6,10 +6,6 @@
 
 #define NODOS 4
 
-typedef struct TH_T{
-	int id;
-}TH_T;
-
 typedef struct matriz_t
 {
 	int filas;
